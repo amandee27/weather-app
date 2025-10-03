@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 import logo from "./assets/icons/logo.svg";
@@ -33,6 +33,22 @@ function App() {
   });
   const [isUnitOpen, setIsUnitOpen] = useState(false);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickedOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsUnitOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickedOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickedOutside);
+    };
+  }, []);
+
   const toggleSelect = (category: string, option: string) => {
     setSelectedUnits((prev) => ({ ...prev, [category]: option }));
   };
@@ -47,7 +63,7 @@ function App() {
           <div>
             <img src={logo} alt="Logo" />
           </div>
-          <div className="relative ">
+          <div className="relative " ref={dropdownRef}>
             <button
               onClick={() => setIsUnitOpen(!isUnitOpen)}
               className="flex gap-[10px] items-center text-white bg-gray-600 w-[119px] h-[19px] px-[16px] py-[12px] rounded-md"
